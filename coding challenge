@@ -1,0 +1,84 @@
+To architect a scalable and secure static web application in AWS, we can follow the steps outlined below:
+
+Step 1: Infrastructure Provisioning
+
+Use AWS CloudFormation or Terraform to define and provision the required AWS resources, such as VPC (Virtual Private Cloud), subnets, security groups, and an EC2 instance for hosting the web server.
+Configure the VPC with public and private subnets, and set up appropriate network ACLs (Access Control Lists) and security groups to control inbound and outbound traffic.
+Step 2: Configuration Management and Deployment
+
+Choose a configuration management tool like Ansible, Chef, or Puppet to automate the configuration of the web server.
+Write the necessary configuration scripts or playbooks to install and configure the web server software (e.g., Nginx or Apache) on the EC2 instance.
+Configure the web server to serve the desired HTML content and enable HTTPS using a self-signed SSL certificate.
+Set up automatic deployment of the web server configuration using a deployment tool like Jenkins, AWS CodeDeploy, or GitLab CI/CD.
+Step 3: Security Enhancements
+
+Configure the security groups associated with the EC2 instance to allow inbound traffic only on the necessary ports, such as port 22 (SSH) for administrative access and port 443 (HTTPS) for web traffic.
+Enable security features like AWS WAF (Web Application Firewall) to protect against common web application vulnerabilities.
+Use AWS Certificate Manager (ACM) to provision a valid SSL/TLS certificate for the web server, rather than using a self-signed certificate. This ensures that the web application is trusted by browsers and improves security.
+Step 4: Automated Testing
+
+Develop automated tests using a testing framework like Selenium or Cypress to validate the correctness of the server configuration.
+Write test cases that check if the web server is running, if the correct HTML content is served, and if HTTP requests are automatically redirected to HTTPS.
+Use a testing framework's features, such as assertions or assertions libraries, to verify the expected behavior of the web server.
+Integrate the automated tests into the deployment pipeline to run them automatically after each deployment.
+Step 5: Version Control and Infrastructure as Code
+
+Store all infrastructure provisioning and configuration management code in a version control system like Git.
+Use Git branching strategies to manage different environments (e.g., development, staging, production).
+Utilize infrastructure as code tools (e.g., AWS CloudFormation, Terraform) to define and manage the infrastructure resources and configurations. This enables reproducibility, scalability, and easier collaboration.
+By following these steps, you can architect a scalable and secure static web application in AWS. It ensures proper infrastructure provisioning, secure deployment, automated testing, and version-controlled infrastructure as code, all of which contribute to a reliable and maintainable web application.
+
+
+
+Coding
+
+package main
+
+import (
+	"fmt"
+	"regexp"
+)
+
+func isValidCreditCardNumber(cardNumber string) bool {
+	// Regex pattern for credit card validation
+	pattern := `^[.,]|^\d{4}(?:-\d{4}){3}$`
+
+	// Check if the card number matches the pattern
+	match, _ := regexp.MatchString(pattern, cardNumber)
+	if !match {
+		return false
+	}
+
+	// Remove hyphens from the card number
+	cardNumber = regexp.MustCompile(`-`).ReplaceAllString(cardNumber, "")
+
+	// Check for consecutive repeated digits
+	for i := 0; i < len(cardNumber)-1; i++ {
+		if cardNumber[i] == cardNumber[i+1] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func main() {
+	var n int
+	fmt.Scanln(&n)
+
+	for i := 0; i < n; i++ {
+		var cardNumber string
+		fmt.Scanln(&cardNumber)
+
+		if len(cardNumber) != 19 {
+			fmt.Println("Invalid")
+			continue
+		}
+
+		if isValidCreditCardNumber(cardNumber) {
+			fmt.Println("Valid")
+		} else {
+			fmt.Println("Invalid")
+		}
+	}
+}
