@@ -1,0 +1,95 @@
+import json
+
+def sanitize_key(key):
+    return key.strip()
+
+def transform_string_value(value):
+    value = value.strip()
+    if value.startswith("RFC3339"):
+        # Convert RFC3339 formatted string to Unix Epoch
+        value = int(value[8:].strip())
+    return value
+
+def transform_number_value(value):
+    value = value.strip()
+    value = value.lstrip("0")
+    if value == "":
+        return None
+    if "." in value:
+        return float(value)
+    return int(value)
+
+def transform_boolean_value(value):
+    value = value.strip().lower()
+    if value in ["1", "t", "true"]:
+        return True
+    if value in ["0", "f", "false"]:
+        return False
+    return None
+
+def transform_null_value(value):
+    value = value.strip().lower()
+    if value in ["1", "t", "true"]:
+        return None
+    return value
+
+def transform_list_value(value):
+    if not isinstance(value, list):
+        return None
+    transformed_list = []
+    for item in value:
+        transformed_item = transform_value(item)
+        if transformed_item is not None:
+            transformed_list.append(transformed_item)
+    if len(transformed_list) == 0:
+        return None
+    return transformed_list
+
+def transform_map_value(value):
+    if not isinstance(value, dict):
+        return None
+    transformed_map = {}
+    for key, item in sorted(value.items()):
+        sanitized_key = sanitize_key(key)
+        transformed_item = transform_value(item)
+        if transformed_item is not None:
+            transformed_map[sanitized_key] = transformed_item
+    if len(transformed_map) == 0:
+        return None
+    return transformed_map
+
+def transform_value(value):
+    if not isinstance(value, dict):
+        return None
+    for key, item in value.items():
+        if key == "S":
+            return transform_string_value(item)
+        if key == "N":
+            return transform_number_value(item)
+        if key == "BOOL":
+            return transform_boolean_value(item)
+        if key == "NULL":
+            return transform_null_value(item)
+        if key == "L":
+            return transform_list_value(item)
+        if key == "M":
+            return transform_map_value(item)
+    return None
+
+def transform_json(input_json):
+    transformed_data = transform_map_value(input_json)
+    return json.dumps([transformed_data])
+
+def main():
+    # Read the input JSON file
+    with open("input.json", "r") as file:
+        input_json = json.load(file)
+
+    # Transform the JSON
+    output_json = transform_json(input_json)
+
+    # Print the output to stdout
+    print(output_json)
+
+if __name__ == "__main__":
+    main()
